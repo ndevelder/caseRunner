@@ -65,8 +65,13 @@ constantE   = np.array([1,1,1,1])
 constantL   = np.array([1,1,1,1])
 lengthScale = np.array([0.1,0.1,0.1,0.1])
 phiValue    = np.array([0.09743541, 0.22499132, 0.31663022, 0.40199916])
+<<<<<<< HEAD
 rPlus 	    = np.array([999.9])
 constantC   = np.array([0.999])
+=======
+rPlus 	    = np.array([20.0,45.0,70.0,100.0])
+constantC   = np.array([0.01,0.1,1.0,2.0,3.0])
+>>>>>>> 1fa983a23d8793495d1efc59d7f6e98426b4b415
 
 nCases = rPlus.shape[0]
 nCons  = constantC.shape[0]
