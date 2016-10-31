@@ -16,7 +16,7 @@ def replace_eps(case,cl,ce,l,rp,cc):
  	if (rp < 25.0):
 		Sr = pow(50.0/float(rp),2)
 	else:
-		Sr = pow(100.0/float(rp),2)
+		Sr = 100.0/float(rp)
 
 	hellstenEpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
 	newEpsExpression = str(ce)+'*pow(internalField(k),1.5)/(0.41*'+str(ce)+'*'+str(l)+')'
@@ -57,7 +57,7 @@ constantL   = np.array([1,1,1,1])
 lengthScale = np.array([0.1,0.1,0.1,0.1])
 phiValue    = np.array([0.09743541, 0.22499132, 0.31663022, 0.40199916])
 rPlus 	    = np.array([20.0,45.0,70.0,100.0])
-constantC   = np.array([0.01,0.1,1.0,3.0,5.0])
+constantC   = np.array([0.01,0.1,1.0,2.0,3.0])
 
 nCases = phiValue.shape[0]
 nCons  = constantC.shape[0]
