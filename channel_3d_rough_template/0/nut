@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+dimensions      [0 2 -1 0 0 0 0];
+internalField   uniform 0.002; 
+boundaryField
+{
+    WALL_TOP
+    {
+        type            groovyBC;
+        valueExpression "0.21*internalField(k)*internalField(tpphi)/internalField(epsilon)";
+        value           uniform 0.0005;
+    }
+    WALL_BOTTOM
+    {
+        type            groovyBC;
+        valueExpression "0.21*internalField(k)*internalField(tpphi)/internalField(epsilon)";
+        value           uniform 0.0005;
+    }
+    SIDE_CYC
+    {
+        type            cyclic;
+        value           uniform 0.02;
+    }
+    INOUT_CYC
+    {
+        type            cyclic;
+        value           uniform 0.02; 
+    }
+}
+// ************************************************************************* //

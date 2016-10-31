@@ -1,0 +1,40 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volSymmTensorField;
+    object      R;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+dimensions      [0 2 -2 0 0 0 0];
+internalField   uniform (0 0 0 0 0 0);
+boundaryField
+{
+    INOUT_CYC
+    {
+        type            cyclic;
+    }
+    SIDE_CYC
+    {
+        type            cyclic;
+    }    
+    WALL_TOP
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+    
+    WALL_BOTTOM
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+}
+// ************************************************************************* //
