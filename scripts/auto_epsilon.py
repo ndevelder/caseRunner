@@ -45,6 +45,22 @@ def replace_tpphi(case,value):
         f.write(newdata)
         f.close()
 
+# Function to replace k expression
+def replace_eps(case,rp):
+        kFile = case+'/0/k'
+
+        f = open(kFile,'r')
+        filedata = f.read()
+        f.close()
+
+	kExpression = 'min(1.0,'+str(rp)+'/90.0)*(nu+nut)*mag(vorticity)/0.3'
+
+        newdata = filedata.replace("<kValueExpression>",kExpression)
+
+        f = open(kFile,'w')
+        f.write(newdata)
+        f.close()
+
 # Source the foam-extend bashrc file
 call(['/bin/bash','-i','-c','fe32'])
 
@@ -81,10 +97,10 @@ for c in range(1,nCons+1):
 		if result == 0:
 			replace_eps(newCase,constantL[n-1],constantE[n-1],lengthScale[n-1],rPlus[n-1],constantC[c-1],epsType)
 			replace_tpphi(newCase,phiValue[n-1])
+			replace_k(newCase,rPlus[n-1])
 
 			if decomposeJob == 'decompose':
 				decompresult = call('decomposePar -case '+newCase,shell=True)
-			
 			if decompresult == 0:
 				if submitJob == 'submit':
 					bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)

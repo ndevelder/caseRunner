@@ -21,13 +21,13 @@ boundaryField
     WALL_TOP
     {
         type            groovyBC;
-        valueExpression "min(1.0,45.0/90.0)*(nu+nut)*mag(vorticity)/0.3";
+        valueExpression "<kValueExpression>";
         value           uniform 2.0;
     }
     WALL_BOTTOM
     {
         type            groovyBC;
-        valueExpression "min(1.0,45.0/90.0)*(nu+nut)*mag(vorticity)/0.3";
+        valueExpression "<kValueExpression>";
         value           uniform 2.0;
     }
     SIDE_CYC
