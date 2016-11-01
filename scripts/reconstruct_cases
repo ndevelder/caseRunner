@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+
+rPlus 	    = np.array(case["data"]["rplus"])
+constantC   = np.array(case["data"]["constantC"])
+
+nCases = rPlus.shape[0]
+nCons  = constantC.shape[0]
+
+# Copy and run loop
+for c in range(1,nCons+1):
+	for n in range(1,nCases+1):
+			newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
+		
+			# Reconstruct case
+			recresult = call('cd '+newCase+' && reconstructPar && cd ..',shell=True)

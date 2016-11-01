@@ -35,8 +35,8 @@ sets
         axis        y;
 
         //- cavity. Slightly perturbed so not to align with face or edge.
-        start       (0.1 1.0 0.0);
-        end         (0.1 -1.0 0.0);
+        start       (0.01 1.0 0.0);
+        end         (0.01 -1.0 0.0);
         nPoints     256;
     }
 );

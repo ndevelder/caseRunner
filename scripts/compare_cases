@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import glob
+import csv
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments
+caseNamePrefix=sys.argv[1]
+caseTime=sys.argv[2]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+resultDir = caseNamePrefix + '_results'
+resultDirPath = runDir + '/' + resultDir
+templateDir = runDir + '/caseRunner/channel_3d_rough_template'
+
+# Find folders matching prefix
+case_folders = glob.glob(runDir+'/'+caseNamePrefix+'*')
+nCases = len(case_folders)
+print 'There are '+str(nCases)+' cases that match!'
+
+# Main loop through cases
+for c in range(1,nCases+1):	
+	# Reconstruct data
+	result = call('cd '+case_folders[c-1]+' && reconstructPar -time '+str(caseTime)+' && cd ..',shell=True)
+	# Copy updated sampleDict
+        result = call('cd '+case_folders[c-1]+' && cp '+templateDir+'/system/sampleDict system/sampleDict && cd ..',shell=True)
+
+for c in range(1,nCases+1):
+	if os.path.isdir(case_folders[c-1]+'/'+str(caseTime)):
+		print 'Reconstructed: '+case_folders[c-1]
+		sampleResult = call('cd '+case_folders[c-1]+' && sample -time '+str(caseTime)+' && cd ..',shell=True)
+		sampleFileU = case_folders[c-1]+'/sets/'+str(caseTime)+'/lineY_U.xy'
+                Udata = list(csv.reader(open(sampleFileU, 'rb'), delimiter='\t'))
+                print Udata
+
+#	for n in range(1,nCases+1):
+#        	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
+#        	print 'Case: ' + newCase
+#		result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
+#
+#		if result == 0:
+#			replace_eps(newCase,constantL[n-1],constantE[n-1],lengthScale[n-1],rPlus[n-1],constantC[c-1],epsType)
+#			replace_tpphi(newCase,phiValue[n-1])
+#			replace_k(newCase,rPlus[n-1])
+#
+#			if decomposeJob == 'decompose':
+#				decompresult = call('decomposePar -case '+newCase,shell=True)
+#			if decompresult == 0:
+#				if submitJob == 'submit':
+#					bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)

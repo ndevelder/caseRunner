@@ -4,6 +4,7 @@
 from subprocess import call
 import os,sys
 import numpy as np
+import json
 
 # Function to replace epsilon expression
 def replace_eps(case,cl,ce,l,rp,cc,epsName):
@@ -64,31 +65,36 @@ def replace_k(case,rp):
 # Source the foam-extend bashrc file
 call(['/bin/bash','-i','-c','fe32'])
 
-# Input arguments
-epsType=sys.argv[1]
-submitJob=sys.argv[2]
-decomposeJob=sys.argv[3]
-
-if len(sys.argv) > 4:
-    print len(sys.argv)
-    caseSuffix = sys.argv[4]
-else:
-    caseSuffix = ''
+# Input arguments/data
+jsonFile=sys.argv[1]
 
 # Set up case dirs
 runDir = os.environ.get('FOAM_RUN')
-caseTemplate = 'channel_3d_rough_template'
-caseTemplatePath =  runDir + '/caseRunner/' + caseTemplate
-newCaseRoot = 'channel_3d_rough_epsTest'+str(caseSuffix)
-newCasePath = runDir + '/' + newCaseRoot
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
 
 # Set up case runs
-constantE   = np.array([1,1,1,1])
-constantL   = np.array([1,1,1,1])
-lengthScale = np.array([0.1,0.1,0.1,0.1])
-phiValue    = np.array([0.09743541, 0.22499132, 0.31663022, 0.40199916])
-rPlus 	    = np.array([20, 45, 70, 100])
-constantC   = np.array([0.01, 0.1, 1, 3])
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+
+constantE   = np.array(case["data"]["constantE"])
+constantL   = np.array(case["data"]["constantL"])
+lengthScale = np.array(case["data"]["lengthScale"])
+phiValue    = np.array(case["data"]["phi"])
+rPlus 	    = np.array(case["data"]["rplus"])
+constantC   = np.array(case["data"]["constantC"])
 
 nCases = rPlus.shape[0]
 nCons  = constantC.shape[0]
@@ -96,8 +102,8 @@ nCons  = constantC.shape[0]
 # Copy and run loop
 for c in range(1,nCons+1):
 	for n in range(1,nCases+1):
-        	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
-        	print 'Case: ' + newCase
+		newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
+		print 'Case: ' + newCase
 		result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
 
 		if result == 0:
@@ -105,8 +111,11 @@ for c in range(1,nCons+1):
 			replace_tpphi(newCase,phiValue[n-1])
 			replace_k(newCase,rPlus[n-1])
 
-			if decomposeJob == 'decompose':
-				decompresult = call('decomposePar -case '+newCase,shell=True)
-			if decompresult == 0:
-				if submitJob == 'submit':
+			if decomposeFlag == 'yes':
+				decompresult = call('cd '+newCase+' && decomposePar -force && cd ..',shell=True)
+
+			if submitFlag == 'yes':
+				if serialRun == "no":
 					bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)
+				if serialRun == "yes":
+					bsubresult = call('cd '+newCase+' && bsub < job.serial.mpi && cd ..',shell=True)
