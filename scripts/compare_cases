@@ -4,54 +4,91 @@
 from subprocess import call
 import os,sys
 import numpy as np
+import json
 import glob
+import re
+import string
 import csv
 
 # Source the foam-extend bashrc file
 call(['/bin/bash','-i','-c','fe32'])
 
-# Input arguments
-caseNamePrefix=sys.argv[1]
-caseTime=sys.argv[2]
+# Input arguments/data
+jsonFile=sys.argv[1]
 
 # Set up case dirs
 runDir = os.environ.get('FOAM_RUN')
-resultDir = caseNamePrefix + '_results'
-resultDirPath = runDir + '/' + resultDir
-templateDir = runDir + '/caseRunner/channel_3d_rough_template'
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
 
-# Find folders matching prefix
-case_folders = glob.glob(runDir+'/'+caseNamePrefix+'*')
-nCases = len(case_folders)
-print 'There are '+str(nCases)+' cases that match!'
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
 
-# Main loop through cases
-for c in range(1,nCases+1):	
-	# Reconstruct data
-	result = call('cd '+case_folders[c-1]+' && reconstructPar -time '+str(caseTime)+' && cd ..',shell=True)
-	# Copy updated sampleDict
-        result = call('cd '+case_folders[c-1]+' && cp '+templateDir+'/system/sampleDict system/sampleDict && cd ..',shell=True)
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
 
-for c in range(1,nCases+1):
-	if os.path.isdir(case_folders[c-1]+'/'+str(caseTime)):
-		print 'Reconstructed: '+case_folders[c-1]
-		sampleResult = call('cd '+case_folders[c-1]+' && sample -time '+str(caseTime)+' && cd ..',shell=True)
-		sampleFileU = case_folders[c-1]+'/sets/'+str(caseTime)+'/lineY_U.xy'
-                Udata = list(csv.reader(open(sampleFileU, 'rb'), delimiter='\t'))
-                print Udata
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+sampleTime = case["sampleTime"]
+vectorSample = case["vectorSample"]
+scalarSample = case["scalarSample"]
+vectorSample.extend(scalarSample)
+fullSample = np.array([str(x) for x in vectorSample])
 
-#	for n in range(1,nCases+1):
-#        	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
-#        	print 'Case: ' + newCase
-#		result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
-#
-#		if result == 0:
-#			replace_eps(newCase,constantL[n-1],constantE[n-1],lengthScale[n-1],rPlus[n-1],constantC[c-1],epsType)
-#			replace_tpphi(newCase,phiValue[n-1])
-#			replace_k(newCase,rPlus[n-1])
-#
-#			if decomposeJob == 'decompose':
-#				decompresult = call('decomposePar -case '+newCase,shell=True)
-#			if decompresult == 0:
-#				if submitJob == 'submit':
-#					bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)
+rPlus 	    = np.array(case["data"]["rplus"])
+constantC   = np.array(case["data"]["constantC"])
+
+nCases = rPlus.shape[0]
+nCons  = constantC.shape[0]
+
+data = []
+
+# Copy and run loop
+for n in range(1,nCases+1): 
+	data = np.insert(fullSample,0,'epsCon')
+	
+	print data
+	
+	for c in range(1,nCons+1):			
+			newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[c-1])
+			
+			# Copy most recent SampleDict
+			#cpresult = call('cp '+caseTemplatePath+'/system/sampleDict '+newCase+'/system/sampleDict',shell=True)
+			
+			# Sample case
+			#recresult = call('cd '+newCase+' && sample -time '+str(sampleTime)+' && cd ..',shell=True)
+			sampleDataDir = newCase+'/sets/'+str(sampleTime)
+			sampleFiles = glob.glob(sampleDataDir+'/*.xy')
+			nF = len(sampleFiles)
+			
+		
+			# Load data
+			d = np.ones([256,1])*constantC[c-1]
+			for (i,datafile) in enumerate(sampleFiles):
+				# Concatenate vector and scalar files
+				d = np.hstack((d, np.loadtxt(str(datafile), skiprows=0)))
+	        
+			data = np.vstack((data,d))
+			
+	# Write to file
+	if not os.path.exists(newCasePath+'_results'):
+		os.makedirs(newCasePath+'_results')
+
+	fp = open(newCasePath + '_results/rplus' + str(rPlus[n-1]) + '.csv', 'wb')
+	wr = csv.writer(fp)
+	for row in data:
+		wr.writerow(row)
+	fp.close()
+	
+destDir = '/home/nate/foam/nate-3.2/run/'+newCaseRoot+'_results'+'_MGHPCC'
+print 'rsync -a -v -e "ssh -c arcfour" '+newCasePath+'_results/'+' nate@thor.ecs.umass.edu:'+destDir
+rcall = call('rsync -a -v -e "ssh -c arcfour" '+newCasePath+'_results/'+' nate@thor.ecs.umass.edu:'+destDir,shell=True)
+
+

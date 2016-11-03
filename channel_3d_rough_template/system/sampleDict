@@ -25,6 +25,13 @@ interpolationScheme cellPoint;
 fields
 (
     U
+    p
+    k
+    epsilon
+    tpphi
+    tppsi
+    vorticity
+    nut
 );
 
 sets
