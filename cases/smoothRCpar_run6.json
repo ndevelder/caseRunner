@@ -1,0 +1,17 @@
+{ "name": "channel_3d_smooth_rcPar6",
+  "template" : "channel_3d_smooth_rcPar_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "constant1" : [1.7, 1.8, 1.9],
+    "constant2"	: [1.44,1.46],
+    "constant3"	: [1.85,1.875]    
+  },
+  "notes" : "Trying to under-balance psi/k so that phi has to be larger"
+}
+

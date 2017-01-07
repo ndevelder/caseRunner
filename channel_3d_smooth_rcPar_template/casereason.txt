@@ -1,0 +1,1 @@
+casereason:LOW epsilon at wall based on length scale + fixed phi + turn off gradient terms + write out phi terms + psi production + k zerograd + k pDiff term

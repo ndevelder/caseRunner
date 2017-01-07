@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      funkySetFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+expressions
+(
+                Velocity
+                {        
+		field U;
+		keepPatches 1; //keep the boundary conditions that were set before
+		lookuptables (
+		{
+		name profilev;
+		outOfBounds clamp;
+		fileName "../channel590initials/data/chan590_y_vel.csv";
+		}
+                );
+                interpolate true;
+                expression "vector(profilev(pos().y),0,0)";
+                }
+
+                Pressure
+                {
+                field p;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profilep;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_p.csv";
+                }
+                );
+
+                expression "profilep(pos().y)";
+                }
+
+                Epsilon
+                {
+
+		field epsilon;
+		keepPatches 1; //keep the boundary conditions that were set before
+		lookuptables (
+		{
+		name profilee;
+		outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_eps.csv";
+		}
+		);
+	
+		expression "profilee(pos().y)";
+	        }
+
+                TKE
+                {
+
+                field k;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profilek;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_k.csv";
+                }
+                );
+                interpolate true;
+                expression "profilek(pos().y)";
+                }
+                
+                TKEsqrt
+                {
+
+                field kSqrt;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profilekSqrt;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_k.csv";
+                }
+                );
+
+                expression "sqrt(profilekSqrt(pos().y))";
+                }
+
+                TPPHI
+                {
+
+                field tpphi;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profiletph;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_tpphi.csv";
+                }
+                );
+
+                expression "profiletph(pos().y)";
+                }
+
+                TPPSI
+                {
+
+                field tppsi;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profiletps;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_tppsi.csv";
+                }
+                );
+
+                expression "vector(0,0,profiletps(pos().y))";                
+                }
+
+                NUT
+                {
+
+                field nut;
+                keepPatches 1; //keep the boundary conditions that were set before
+                lookuptables (
+                {
+                name profilen;
+                outOfBounds clamp;
+                fileName "../channel590initials/data/chan590_y_nut.csv";
+                }
+                );
+
+                expression "profilen(pos().y)";                
+                }
+
+);

@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+import glob
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+
+constant1   = np.array(case["data"]["constant1"])
+constant2   = np.array(case["data"]["constant2"])
+constant3   = np.array(case["data"]["constant3"])
+
+n_c_one = constant1.shape[0]
+n_c_two  = constant2.shape[0]
+n_c_three = constant3.shape[0]
+
+# Copy and run loop
+for i in range(1,n_c_one+1):
+        for c in range(1,n_c_two+1):
+                for n in range(1,n_c_three+1):
+				
+				newCase = newCasePath+'_'+str(constant1[i-1])+'_'+str(constant2[c-1])+'_'+str(constant3[n-1])
+		
+				# Get case dir list
+				mainDir = [os.path.basename(x) for x in glob.glob(newCase+'/[1-9]*')]
+				mainDirS = np.array([float(x) for x in mainDir])
+				procDir = [os.path.basename(x) for x in glob.glob(newCase+'/processor0/[1-9]*')]
+				procDirS = np.array([float(x) for x in procDir])
+				
+				print '-------------------------------------'
+				print bcolors.HEADER + newCase + bcolors.ENDC
+				
+				if len(mainDir) > 0:
+					print 'Main case dir: ' + bcolors.HEADER + str(np.max(mainDirS)) + bcolors.ENDC
+				else:
+					print 'No timesteps in main directory'
+				
+				if len(procDir) > 0:
+					print 'Proc1 case dir: ' + bcolors.HEADER + str(np.max(mainDirS)) + bcolors.ENDC
+				else:
+					print 'No timesteps in proc directory'
+				
+				if (len(mainDir) > 0 and len(procDir) < 1):
+					print bcolors.OKGREEN + 'Seems like serial case' + bcolors.ENDC
+				elif (len(mainDir) > 0 and len(procDir) > 1 and mainDir == procDir):
+					print bcolors.OKGREEN + 'Main directory up to date' + bcolors.ENDC
+				elif (len(mainDir) < 1 and len(procDir) < 1):
+					print bcolors.FAIL + 'Case did not run or has not recorded any timesteps' + bcolors.ENDC
+				else:
+					print bcolors.WARNING+ 'Might need reconstruction' + bcolors.ENDC
+				#recresult = call('cd '+newCase+' && reconstructPar && cd ..',shell=True)

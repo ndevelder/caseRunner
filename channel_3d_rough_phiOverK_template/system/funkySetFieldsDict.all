@@ -1,0 +1,130 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      funkySetFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+expressions
+(
+                Velocity
+                {        
+		field U;
+		
+		lookuptables (
+		{
+		name profilev;
+		outOfBounds clamp;
+		fileName "/home/nate/Documents/TurbulentChannel/chan590_y_vel.csv";
+		}
+                );
+              
+                expression "vector(profilev(pos().y),0,0)";
+                }
+
+                Pressure
+                {
+                field p;
+
+                lookuptables (
+                {
+                name profilep;
+                outOfBounds clamp;
+                fileName "/home/nate/Documents/TurbulentChannel/chan590_y_p.csv";
+                }
+                );
+
+                expression "profilep(pos().y)";
+                }
+
+                Epsilon
+                {
+
+		field epsilon;
+		
+		lookuptables (
+		{
+		name profilee;
+		outOfBounds clamp;
+		fileName "/home/nate/Documents/TurbulentChannel/chan590_y_eps.csv";
+		}
+		);
+	
+		expression "profilee(pos().y)";
+	        }
+
+                TKE
+                {
+
+                field k;
+
+                lookuptables (
+                {
+                name profilek;
+                outOfBounds clamp;
+                fileName "/home/nate/Documents/TurbulentChannel/chan590_y_k.csv";
+                }
+                );
+
+                expression "profilek(pos().y)";
+                }
+
+                TPPHI
+                {
+
+                field tpphi;
+
+                lookuptables (
+                {
+                name profiletph;
+                outOfBounds clamp;
+                fileName "/home/nate/Documents/TurbulentChannel/chan590_y_tpphi.csv";
+                }
+                );
+
+                expression "profiletph(pos().y)";
+                }
+
+                TPPSI
+                {
+
+                field tppsi;
+
+                lookuptables (
+                {
+                name profiletps;
+                outOfBounds clamp;
+                fileName "/home/nate/Documents/TurbulentChannel/chan590_y_tppsi.csv";
+                }
+                );
+
+                expression "vector(0,0,profiletps(pos().y))";                
+                }
+
+                NUT
+                {
+
+                field nut;
+
+                lookuptables (
+                {
+                name profilen;
+                outOfBounds clamp;
+                fileName "/home/nate/Documents/TurbulentChannel/chan590_y_nut.csv";
+                }
+                );
+
+                expression "profilen(pos().y)";                
+                }
+
+);

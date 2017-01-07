@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| ========= | |
+| \\ / F ield | OpenFOAM: The Open Source CFD Toolbox |
+| \\ / O peration | Version: 2.1.x |
+| \\ / A nd | Web: www.OpenFOAM.org |
+| \\/ M anipulation | |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+setFormat raw;
+
+surfaceFormat raw;
+
+interpolationScheme cellPointFace;
+
+// Fields to sample.
+fields
+(
+    U
+    p
+    k
+    epsilon
+    tpphi
+    tppsi
+    vorticity
+    nut
+);
+
+sets
+(
+    lineY
+    {
+        type        face;
+        axis        y;
+
+        //- cavity. Slightly perturbed so not to align with face or edge.
+        start       (0.019 1.0 0.0);
+        end         (0.019 -1.0 0.0);
+    }
+);
+
+surfaces
+(
+);
+
+
+// *********************************************************************** //

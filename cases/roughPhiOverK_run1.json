@@ -1,0 +1,19 @@
+{ "name": "channel_3d_rough_phiOverK",
+  "template" : "channel_3d_rough_phiOverK_template",
+  "epsType": "constantOnly",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "rplus" : [5,10,25,60,100],
+    "phi" : [0.001125318, 0.027836682, 0.117685390, 0.261542659, 0.371670821],
+    "constantC" : [0.2396, 0.157, 0.084, 0.108, 0.15],
+    "constantE"	: [1, 1, 1, 1, 1],
+    "constantL"	: [1, 1, 1, 1, 1],
+    "lengthScale" : [1, 1, 1, 1, 1]   
+  }
+}
+

@@ -1,0 +1,146 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+
+# Function to replace epsilon expression
+# def replace_eps(case,cl,ce,l,rp,cc,epsName):
+	# epsFile = case+'/0/epsilon'
+
+	# f = open(epsFile,'r')
+	# filedata = f.read()
+	# f.close()
+
+	# if epsName == 'hellsten':
+		# if (rp < 25.0):
+			# Sr = pow(50.0/float(rp),2)
+		# else:
+			# Sr = 100.0/float(rp)
+			# EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
+	# elif epsName == 'eca':
+		# EpsExpression = str(ce)+'*pow(internalField(k),1.5)/(0.41*'+str(ce)+'*'+str(l)+')'
+	# elif epsName == 'nate':
+		# if(rp <= 25):
+			# Sr = 0.21 + 0.09*pow(float(rp)/25,3)
+		# else:
+			# Sr = 0.93 - (1.0-np.exp(-25.0/float(rp)))
+		# EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
+	# elif epsName == 'smooth':
+		# EpsExpression = "2*nu*sqr(mag(snGrad(kSqrt)))"
+	# else:
+		# EpsExpression = str(cc)+'*pow((nu+0.833*nut)*mag(vorticity),2)/nu'   
+
+	# newdata = filedata.replace("<valueExpressionHere>",EpsExpression)
+
+	# f = open(epsFile,'w')
+	# f.write(newdata)
+	# f.close()
+
+# Function to replace tpphi expression
+def replace_tpphi(case,rp,ks):
+        tpphiFile = case+'/0/tpphi'
+
+        f = open(tpphiFile,'r')
+        filedata = f.read()
+        f.close()
+
+	tpphiExpression = str(ks)
+
+        newdata = filedata.replace("<tpphiValueExpression>",tpphiExpression)
+
+        f = open(tpphiFile,'w')
+        f.write(newdata)
+        f.close()
+
+# Function to replace k expression
+def replace_k(case,rp,ks):
+        kFile = case+'/0/k'
+
+        f = open(kFile,'r')
+        filedata = f.read()
+        f.close()
+
+	kExpression = str(ks)
+
+        newdata = filedata.replace("<kValueExpression>",kExpression)
+
+        f = open(kFile,'w')
+        f.write(newdata)
+        f.close()
+		
+# Function to replace epsilon expression
+def replace_eps(case,rp,ks):
+        epsFile = case+'/0/epsilon'
+
+        f = open(epsFile,'r')
+        filedata = f.read()
+        f.close()
+
+	epsExpression = str(ks)
+
+        newdata = filedata.replace("<epsValueExpression>",epsExpression)
+
+        f = open(epsFile,'w')
+        f.write(newdata)
+        f.close()
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+
+constantE   = np.array(case["data"]["constantE"])
+constantL   = np.array(case["data"]["constantL"])
+lengthScale = np.array(case["data"]["lengthScale"])
+phiValue    = np.array(case["data"]["phi"])
+rPlus 	    = np.array(case["data"]["rplus"])
+constantC   = np.array(case["data"]["constantC"])
+ks		    = np.array(case["data"]["ks"])
+
+nCases = rPlus.shape[0]
+nCons  = constantC.shape[0]
+
+# Copy and run loop
+for n in range(1,nCases+1):
+	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[n-1])
+	print 'Case: ' + newCase
+	result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
+
+	if result == 0:
+		replace_eps(newCase,rPlus[n-1],ks[n-1])
+		replace_tpphi(newCase,rPlus[n-1],ks[n-1])
+		replace_k(newCase,rPlus[n-1],ks[n-1])
+
+		if decomposeFlag == 'yes':
+			decompresult = call('cd '+newCase+' && decomposePar -force && cd ..',shell=True)
+
+		if submitFlag == 'yes':
+			if serialRun == "no":
+				bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)
+			if serialRun == "yes":
+				bsubresult = call('cd '+newCase+' && bsub < job.serial.mpi && cd ..',shell=True)

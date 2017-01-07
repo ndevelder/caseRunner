@@ -13,18 +13,25 @@ def replace_eps(case,cl,ce,l,rp,cc,epsName):
 	f = open(epsFile,'r')
 	filedata = f.read()
 	f.close()
-
- 	if (rp < 25.0):
-		Sr = pow(50.0/float(rp),2)
-	else:
-		Sr = 100.0/float(rp)
-
+	
 	if epsName == 'hellsten':
-		EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
+		if (rp < 25.0):
+			Sr = pow(50.0/float(rp),2)
+		else:
+			Sr = 100.0/float(rp)
+			EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
 	elif epsName == 'eca':
 		EpsExpression = str(ce)+'*pow(internalField(k),1.5)/(0.41*'+str(ce)+'*'+str(l)+')'
+	elif epsName == 'nate':
+		if(rp <= 25):
+			Sr = 0.21 + 0.09*pow(float(rp)/25,3)
+		else:
+			Sr = 0.93 - (1.0-np.exp(-25.0/float(rp)))
+		EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
+	elif epsName == 'smooth':
+		EpsExpression = "2*nu*sqr(mag(snGrad(kSqrt)))"
 	else:
-		EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'   
+		EpsExpression = str(cc)+'*pow((nu+0.833*nut)*mag(vorticity),2)/nu'   
 	
 	newdata = filedata.replace("<valueExpressionHere>",EpsExpression)
 

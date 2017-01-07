@@ -1,0 +1,19 @@
+{ "name": "channel_3d_smooth_divK",
+  "template" : "channel_3d_smooth_divK_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 80, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "rplus" : [0],
+    "phi" : [1],
+    "constantC" : [1],
+    "constantE"	: [1],
+    "constantL"	: [1],
+    "lengthScale" : [1]     
+  }
+}
+

@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+import glob
+import re
+import string
+import csv
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+sampleTime = case["sampleTime"]
+vectorSample = case["vectorSample"]
+scalarSample = case["scalarSample"]
+vectorSample.extend(scalarSample)
+fullSample = np.array([str(x) for x in vectorSample])
+
+constant1   = np.array(case["data"]["constant1"])
+constant2   = np.array(case["data"]["constant2"])
+constant3   = np.array(case["data"]["constant3"])
+
+n_c_one = constant1.shape[0]
+n_c_two  = constant2.shape[0]
+n_c_three = constant3.shape[0]
+
+data = []
+data = np.insert(fullSample,np.array([0,0,0]),np.array(['C1','C2','C3']))
+
+# Copy and run loop
+for i in range(1,n_c_one+1):
+	for c in range(1,n_c_two+1):
+		for n in range(1,n_c_three+1):
+			newCase = newCasePath+'_'+str(constant1[i-1])+'_'+str(constant2[c-1])+'_'+str(constant3[n-1])
+			print(newCase)
+			
+			data = []
+			data = np.insert(fullSample,np.array([0,0,0]),np.array(['C1','C2','C3']))
+			
+			#Copy most recent SampleDict
+			cpcomm = 'cp '+caseTemplatePath+'/system/sampleDict '+newCase+'/system/sampleDict'
+			cpresult = call(cpcomm,shell=True)
+			
+			#Sample case
+			recresult = call('cd '+ newCase + ' && sample -time '+str(sampleTime)+' && cd ..',shell=True)
+			sampleDataDir = newCase+'/sets/'+str(sampleTime)
+			sampleFiles = glob.glob(sampleDataDir+'/*.xy')
+			nF = len(sampleFiles)
+			
+		
+			#Load data
+			d1 = np.ones([256,1])*constant1[i-1]
+			d2 = np.ones([256,1])*constant2[c-1]
+			d3 = np.ones([256,1])*constant3[n-1]
+			d = np.hstack((d1,d2,d3))
+			for (j,datafile) in enumerate(sampleFiles):
+				ff = np.loadtxt(str(datafile), skiprows=0)
+				d = np.hstack((d,ff))
+	        
+			data = np.vstack((data,d))
+			
+			#Write to file
+			if not os.path.exists(newCasePath+'_'+str(sampleTime)+'_results'):
+				os.makedirs(newCasePath+'_'+str(sampleTime)+'_results')
+
+			fp = open(newCasePath +'_'+str(sampleTime)+ '_results/constants' +'_'+str(constant1[i-1])+'_'+str(constant2[c-1])+'_'+str(constant3[n-1]) + '.csv', 'wb')
+			wr = csv.writer(fp)
+			for row in data:
+				wr.writerow(row)
+			fp.close()
+
+#Copy most recent SampleDict
+cpdef = 'cp '+ caseRunnerDir + '/cases/' +jsonFile + ' ' +newCasePath +'_'+str(sampleTime)+'_results/' + jsonFile
+cpresult = call(cpdef,shell=True)
+			
+destDir = '/home/nate/foam/nate-3.2/run/'+newCaseRoot +'_'+str(sampleTime)+'_results'+'_MGHPCC'
+print 'rsync -a -v -e "ssh -c arcfour" '+newCasePath +'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir
+rcall = call('rsync -a -v -e "ssh -c arcfour" '+newCasePath +'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir,shell=True)
+
+

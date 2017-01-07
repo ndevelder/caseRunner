@@ -1,0 +1,74 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      RASProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+RASModel            turbulentPotential;
+
+turbulence          on;
+
+printCoeffs         on;
+
+turbulentPotentialCoeffs{
+
+   solveK              true;
+   solveEps            true;
+   solvePsi            true;
+   solvePhi            true;
+   solveNut            true;
+   timeScaleEps        epsilon;
+   prodType            psi;
+   eqnSigmaK           false;
+   eqnSigmaEps         false;
+   eqnSigmaPhi         false;
+   eqnSigmaPsi         false;
+   eqncEp2             false;
+   eqnEpsHat           mod;
+   nutType             phi;
+   sigmaKInit          1.0;
+   sigmaEpsInit        0.833;
+   sigmaEpsVisc        1.0;
+   sigmaPhiInit        0.667;
+   sigmaPsiInit        1.0;
+   psiNuFrac           1.0;
+   phiNuFrac           1.0;
+   phiV1               0.0;
+   cT                  0.0;
+   cD1                 2.0;
+   cD2                 0.67;
+   cP1                 2.0;
+   cPphi               2.0;
+   cP2                 0.6;
+   cP3                 0.12;
+   cP4                 0.85714;
+   cEp2con	       1.857;
+   cMu                 0.21;
+   cPr                 0.857;
+   cEp1                1.45;
+   cEhm                10.0;
+   cEhr                0.0019;
+   cVv1                0.0;
+   cTv1                0.0;
+   debugWrite          false;
+   tslimiter           true;
+   psiProd             psi;
+   gT1                 0.0;
+   gT2                 0.0;
+   gT3                 0.0;
+   cNF                 10.0;
+   cPw                 12.5;
+}
+
+// ************************************************************************* //
+

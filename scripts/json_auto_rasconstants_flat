@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+
+# Function to replace ras constants
+def replace_constants(case,c_one,c_two,c_three,c_four):
+	
+	cFile = case+'/constant/RASProperties'
+
+	f = open(cFile,'r')
+	filedata = f.read()
+	f.close()  
+	
+	newdata = filedata.replace("<c1ValueHere>",str(c_one))
+	newdata = newdata.replace("<c2ValueHere>",str(c_two))
+	newdata = newdata.replace("<c3ValueHere>",str(c_three))
+	newdata = newdata.replace("<c4ValueHere>",str(c_four))
+
+	f = open(cFile,'w')
+	f.write(newdata)
+	f.close()
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+
+constant1   = np.array(case["data"]["constant1"])
+constant2   = np.array(case["data"]["constant2"])
+constant3   = np.array(case["data"]["constant3"])
+constant4   = np.array(case["data"]["constant4"])
+
+nCases = constant1.shape[0]
+nCons  = constant1.shape[0]
+
+# Copy and run loop
+for n in range(1,nCases+1):
+	newCase = newCasePath+'_'+str(constant1[n-1])+'_'+str(constant2[n-1])+'_'+str(constant3[n-1])+'_'+str(constant4[n-1])
+	print 'Case: ' + newCase
+	result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
+
+	if result == 0:
+		replace_constants(newCase,constant1[n-1],constant2[n-1],constant3[n-1],constant4[n-1])
+
+		if decomposeFlag == 'yes':
+			decompresult = call('cd '+newCase+' && decomposePar -force && cd ..',shell=True)
+
+		if submitFlag == 'yes':
+			if serialRun == "no":
+				bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)
+			if serialRun == "yes":
+				bsubresult = call('cd '+newCase+' && bsub < job.serial.mpi && cd ..',shell=True)

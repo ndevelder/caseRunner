@@ -1,0 +1,19 @@
+{ "name": "channel_3d_rough_epsTest5",
+  "template" : "channel_3d_rough_template",
+  "epsType": "constantOnly",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60,
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "rplus" : [5,10,25,45,70,100],
+    "phi" : [0.001217143, 0.030108156, 0.127288518, 0.224991319, 0.316630219, 0.401999160],
+    "constantC" : [0.2396128, 0.2156459, 0.1270000, 0.1023815, 0.1004067, 0.1000977],
+    "constantE"	: [1, 1, 1, 1, 1, 1],
+    "constantL"	: [1, 1, 1, 1, 1, 1],
+    "lengthScale" : [1, 1, 1, 1, 1, 1]     
+  }
+}
+

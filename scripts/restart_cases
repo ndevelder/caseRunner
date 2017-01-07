@@ -8,10 +8,29 @@ import numpy as np
 # Source the foam-extend bashrc file
 call(['/bin/bash','-i','-c','fe32'])
 
+# Input arguments/data
+jsonFile=sys.argv[1]
+
 # Set up case dirs
 runDir = os.environ.get('FOAM_RUN')
-newCaseRoot = 'channel_3d_rough_epsTest_kuTau'
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
 newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
 
 # Set up case runs
 rPlus 	    = np.array([20, 45, 70, 100])

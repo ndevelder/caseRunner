@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+# Find epsilon boundary conditions
+
+from subprocess import call
+import os,sys
+import numpy as np
+import json
+import glob
+import re
+import string
+import csv
+
+# Source the foam-extend bashrc file
+call(['/bin/bash','-i','-c','fe32'])
+
+# Input arguments/data
+jsonFile=sys.argv[1]
+
+# Set up case dirs
+runDir = os.environ.get('FOAM_RUN')
+scriptDir = os.path.dirname(os.path.abspath(__file__))
+caseRunnerDir = os.path.dirname(scriptDir)
+
+# Load json data
+json_data=open(caseRunnerDir+'/cases/'+jsonFile)
+case = json.load(json_data)
+json_data.close()
+
+# Set up case runs
+caseTemplate = case['template']
+caseTemplatePath =  caseRunnerDir + '/' + caseTemplate
+newCaseRoot = case['name']
+newCasePath = runDir + '/' + newCaseRoot
+
+submitFlag = case["submit"]
+decomposeFlag = case["decompose"]
+epsType = case["epsType"]
+serialRun = case["serialRun"]
+sampleTime = case["sampleTime"]
+vectorSample = case["vectorSample"]
+scalarSample = case["scalarSample"]
+vectorSample.extend(scalarSample)
+fullSample = np.array([str(x) for x in vectorSample])
+
+rPlus 	    = np.array(case["data"]["rplus"])
+constantC   = np.array(case["data"]["constantC"])
+
+nCases = rPlus.shape[0]
+nCons  = constantC.shape[0]
+
+data = []
+
+# Copy and run loop
+for n in range(1,nCases+1): 
+	data = np.insert(fullSample,0,'epsCon')
+	
+	print data
+	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[n-1])
+	
+	# Copy most recent SampleDict
+	cpresult = call('cp '+caseTemplatePath+'/system/sampleDict '+newCase+'/system/sampleDict',shell=True)
+	
+	# Sample case
+	recresult = call('cd '+newCase+' && sample -time '+str(sampleTime)+' && cd ..',shell=True)
+	sampleDataDir = newCase+'/sets/'+str(sampleTime)
+	sampleFiles = glob.glob(sampleDataDir+'/*.xy')
+	nF = len(sampleFiles)
+	
+
+	# Load data
+	d = np.ones([256,1])*constantC[n-1]
+	for (i,datafile) in enumerate(sampleFiles):
+		# Concatenate vector and scalar files
+		tmp = np.loadtxt(str(datafile), skiprows=0)
+		print "Shape: " + str(tmp.shape)
+		d = np.hstack((d, tmp))
+	
+	data = np.vstack((data,d))
+			
+	# Write to file
+	if not os.path.exists(newCasePath+'_'+str(sampleTime)+'_results'):
+		os.makedirs(newCasePath+'_'+str(sampleTime)+'_results')
+
+	fp = open(newCasePath +'_'+str(sampleTime)+ '_results/rplus' + str(rPlus[n-1]) + '.csv', 'wb')
+	wr = csv.writer(fp)
+	for row in data:
+		wr.writerow(row)
+	fp.close()
+	
+destDir = '/home/nate/foam/nate-3.2/run/'+newCaseRoot+'_'+str(sampleTime)+'_results'+'_MGHPCC'
+print 'rsync -a -v -e "ssh -c arcfour" '+newCasePath+'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir
+rcall = call('rsync -a -v -e "ssh -c arcfour" '+newCasePath+'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir,shell=True)
+
+
