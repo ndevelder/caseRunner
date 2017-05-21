@@ -1,0 +1,17 @@
+{ "name": "channel_3d_smooth_rcParNew15",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","tpProd"],
+  "data": {
+    "constant1" : [0.357, 0.42, 0.5],
+    "constant2"	: [1.0, 1.125, 1.25],
+    "constant3" : [50, 100, 150]  
+  },
+  "notes" : "Playing with new Production term cD3 , sigmaK, and cPw"
+}
+

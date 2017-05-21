@@ -6,41 +6,8 @@ import os,sys
 import numpy as np
 import json
 
-# Function to replace epsilon expression
-# def replace_eps(case,cl,ce,l,rp,cc,epsName):
-	# epsFile = case+'/0/epsilon'
-
-	# f = open(epsFile,'r')
-	# filedata = f.read()
-	# f.close()
-
-	# if epsName == 'hellsten':
-		# if (rp < 25.0):
-			# Sr = pow(50.0/float(rp),2)
-		# else:
-			# Sr = 100.0/float(rp)
-			# EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
-	# elif epsName == 'eca':
-		# EpsExpression = str(ce)+'*pow(internalField(k),1.5)/(0.41*'+str(ce)+'*'+str(l)+')'
-	# elif epsName == 'nate':
-		# if(rp <= 25):
-			# Sr = 0.21 + 0.09*pow(float(rp)/25,3)
-		# else:
-			# Sr = 0.93 - (1.0-np.exp(-25.0/float(rp)))
-		# EpsExpression = str(cc)+'*'+str(Sr)+'*'+'pow((nu+0.833*nut)*mag(vorticity),2)/nu'
-	# elif epsName == 'smooth':
-		# EpsExpression = "2*nu*sqr(mag(snGrad(kSqrt)))"
-	# else:
-		# EpsExpression = str(cc)+'*pow((nu+0.833*nut)*mag(vorticity),2)/nu'   
-
-	# newdata = filedata.replace("<valueExpressionHere>",EpsExpression)
-
-	# f = open(epsFile,'w')
-	# f.write(newdata)
-	# f.close()
-
 # Function to replace tpphi expression
-def replace_tpphi(case,rp,ks):
+def replace_tpphi(case,rp,ks,pk,rt,ph):
         tpphiFile = case+'/0/tpphi'
 
         f = open(tpphiFile,'r')
@@ -48,9 +15,20 @@ def replace_tpphi(case,rp,ks):
         f.close()
 
 	tpphiExpression = str(ks)
-
-        newdata = filedata.replace("<tpphiValueExpression>",tpphiExpression)
-
+	pkValue = str(pk)
+	rtValue = str(rt)
+	phValue = str(ph)
+	
+	if(rtValue == "fixedRatio"):
+		newdata = filedata.replace("<ksValueExpression>",tpphiExpression)
+		newdata = newdata.replace("<pkCValue>",pkValue)
+		newdata = newdata.replace("<rTypeValue>",rtValue)
+		
+	if(rtValue == "fixed"):
+		newdata = filedata.replace("<ksValueExpression>",tpphiExpression)
+		newdata = newdata.replace("<pkCValue>",phValue)
+		newdata = newdata.replace("<rTypeValue>",rtValue)
+		
         f = open(tpphiFile,'w')
         f.write(newdata)
         f.close()
@@ -65,7 +43,7 @@ def replace_k(case,rp,ks):
 
 	kExpression = str(ks)
 
-        newdata = filedata.replace("<kValueExpression>",kExpression)
+        newdata = filedata.replace("<ksValueExpression>",kExpression)
 
         f = open(kFile,'w')
         f.write(newdata)
@@ -81,7 +59,7 @@ def replace_eps(case,rp,ks):
 
 	epsExpression = str(ks)
 
-        newdata = filedata.replace("<epsValueExpression>",epsExpression)
+        newdata = filedata.replace("<ksValueExpression>",epsExpression)
 
         f = open(epsFile,'w')
         f.write(newdata)
@@ -113,6 +91,8 @@ submitFlag = case["submit"]
 decomposeFlag = case["decompose"]
 epsType = case["epsType"]
 serialRun = case["serialRun"]
+pkratio = case["pkC"]
+rType = case["rType"]
 
 constantE   = np.array(case["data"]["constantE"])
 constantL   = np.array(case["data"]["constantL"])
@@ -127,13 +107,13 @@ nCons  = constantC.shape[0]
 
 # Copy and run loop
 for n in range(1,nCases+1):
-	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(constantC[n-1])
+	newCase = newCasePath+'_'+str(rPlus[n-1])+'_'+str(phiValue[n-1])
 	print 'Case: ' + newCase
 	result = call('cp -R '+caseTemplatePath+'/ '+newCase,shell=True)
 
 	if result == 0:
 		replace_eps(newCase,rPlus[n-1],ks[n-1])
-		replace_tpphi(newCase,rPlus[n-1],ks[n-1])
+		replace_tpphi(newCase,rPlus[n-1],ks[n-1],pkratio,rType,phiValue[n-1])
 		replace_k(newCase,rPlus[n-1],ks[n-1])
 
 		if decomposeFlag == 'yes':

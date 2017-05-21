@@ -16,7 +16,7 @@ FoamFile
 
 transportModel  Newtonian;
 
-nu              nu [0 2 -1 0 0 0 0] 0.001703;
+nu              nu [0 2 -1 0 0 0 0] 0.00170303;
 
 forcingTerm     forcingTerm [0 0 0 0 0 0 0] -1.0;
 

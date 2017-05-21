@@ -1,0 +1,17 @@
+{ "name": "channel_3d_smooth_rcParNew5",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "constant1" : [1.0, 1.5, 2.0],
+    "constant2"	: [0.25, 0.33, 0.41],
+    "constant3"	: [0.6, 0.633, 0.657]    
+  },
+  "notes" : "Playing with cD2 and cD3 and cD4"
+}
+

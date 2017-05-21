@@ -32,6 +32,8 @@ fields
     tppsi
     vorticity
     nut
+	epsHat
+	tpProd
 );
 
 sets

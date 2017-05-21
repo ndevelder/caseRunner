@@ -16,31 +16,35 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 1.0; 
+internalField   uniform 2.0; 
 
 boundaryField
 {
     WALL_TOP
     {
         type            epsilonLowReRoughWallTP;
-        ks              <epsValueExpression>;
-        value           uniform 1.0;
+        ks              <ksValueExpression>;
+		epsType			utau3;
+		sr				0.25;
+        value           uniform 15.0;
     }
     WALL_BOTTOM
     {
         type            epsilonLowReRoughWallTP;
-        ks              <epsValueExpression>;
-        value           uniform 1.0;
+        ks              <ksValueExpression>;
+		epsType			utau3;
+		sr				0.25;
+        value           uniform 15.0;
     }
     SIDE_CYC
     {
         type            cyclic;
-        value           uniform 1.0;
+        value           uniform 2.0;
     }
     INOUT_CYC
     {
         type            cyclic;
-        value           uniform 1.0; 
+        value           uniform 2.0; 
     }
 }
 // ************************************************************************* //

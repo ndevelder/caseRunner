@@ -21,12 +21,12 @@ boundaryField
     WALL_TOP
     {
         type            fixedValue;
-        value           uniform 6.7e-11;
+        value           uniform 1e-15;
     }
     WALL_BOTTOM
     {
         type            fixedValue;
-        value           uniform 6.7e-11;
+        value           uniform 1e-15;
     }
     SIDE_CYC
     {

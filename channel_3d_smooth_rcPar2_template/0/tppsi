@@ -20,15 +20,11 @@ boundaryField
 {
     WALL_TOP
     {
-        //type            groovyBC;
-        //valueExpression "nu*internalField(vorticity)";
         type            fixedValue;
         value           uniform (0.0 0.0 0.0);
     }
     WALL_BOTTOM
     {
-     	//type            groovyBC;
-        //valueExpression	"nu*internalField(vorticity)";
         type            fixedValue;
         value           uniform (0.0 0.0 0.0);
     }

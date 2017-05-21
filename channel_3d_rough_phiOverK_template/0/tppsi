@@ -21,11 +21,15 @@ boundaryField
     WALL_TOP
     {
         type            tppsiLowReRoughWallTP;
+        cr 				1.0;
+        pswType         nut;
         value           uniform (0.0 0.0 0.0);
     }
     WALL_BOTTOM
     {
         type            tppsiLowReRoughWallTP;
+        cr              1.0;
+       	pswType	       	nut;
         value           uniform (0.0 0.0 0.0);
     }
     SIDE_CYC

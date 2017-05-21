@@ -15,22 +15,18 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 dimensions      [0 2 -1 0 0 0 0];
-internalField   uniform 0.002; 
+internalField   uniform 0.02; 
 boundaryField
 {
     WALL_TOP
     {
-        type            groovyBC;
-       	valueExpression "0.21*internalField(k)*internalField(k)*internalField(tpphi)/internalField(epsilon)";
-        //valueExpression "0.21*internalField(tpphi)*6.0*sqrt(nu/internalField(epsilon))";
-        value           uniform 0.0005;
+        type            fixedValue;
+        value           uniform 1e-15;
     }
     WALL_BOTTOM
     {
-        type            groovyBC;
-       	valueExpression "0.21*internalField(k)*internalField(k)*internalField(tpphi)/internalField(epsilon)";
-        //valueExpression "0.21*internalField(tpphi)*6.0*sqrt(nu/internalField(epsilon))";
-        value           uniform 0.0005;
+        type            fixedValue;
+        value           uniform 1e-15;
     }
     SIDE_CYC
     {

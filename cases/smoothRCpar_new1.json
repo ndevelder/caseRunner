@@ -1,0 +1,17 @@
+{ "name": "channel_3d_smooth_rcParNew1",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut"],
+  "data": {
+    "constant1" : [25, 50, 75],
+    "constant2"	: [1.5, 2.0, 2.5],
+    "constant3"	: [0.0,-0.5,-1.0]    
+  },
+  "notes" : "Playing with psi sigmas, retau constant, and visc grad constant"
+}
+

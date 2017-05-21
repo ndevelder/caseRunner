@@ -22,15 +22,19 @@ boundaryField
 {
     WALL_TOP
     {
-        type            groovyBC;
-        valueExpression "2*nu*sqr(mag(snGrad(kSqrt)))";
-        value           uniform 135.008;
+        type            epsilonLowReRoughWallTP;
+        ks              1e-10;
+	epsType			smooth;
+	sr				0.25;
+        value           uniform 1.0;
     }
     WALL_BOTTOM
     {
-        type            groovyBC;
-		valueExpression "2*nu*sqr(mag(snGrad(kSqrt)))";
-        value           uniform 135.008;
+        type            epsilonLowReRoughWallTP;
+        ks              1e-10;
+	epsType			smooth;
+	sr				0.25;
+        value           uniform 1.0;
     }
     SIDE_CYC
     {

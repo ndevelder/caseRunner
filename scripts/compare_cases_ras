@@ -42,9 +42,14 @@ scalarSample = case["scalarSample"]
 vectorSample.extend(scalarSample)
 fullSample = np.array([str(x) for x in vectorSample])
 
+print fullSample;
+
+ctypes = case["dataTypes"]
+
 constant1   = np.array(case["data"]["constant1"])
 constant2   = np.array(case["data"]["constant2"])
 constant3   = np.array(case["data"]["constant3"])
+
 
 n_c_one = constant1.shape[0]
 n_c_two  = constant2.shape[0]
@@ -65,7 +70,9 @@ for i in range(1,n_c_one+1):
 			
 			#Copy most recent SampleDict
 			cpcomm = 'cp '+caseTemplatePath+'/system/sampleDict '+newCase+'/system/sampleDict'
+			print cpcomm;
 			cpresult = call(cpcomm,shell=True)
+			print "Copy result: " + str(cpresult);
 			
 			#Sample case
 			recresult = call('cd '+ newCase + ' && sample -time '+str(sampleTime)+' && cd ..',shell=True)
@@ -73,32 +80,53 @@ for i in range(1,n_c_one+1):
 			sampleFiles = glob.glob(sampleDataDir+'/*.xy')
 			nF = len(sampleFiles)
 			
-		
-			#Load data
-			d1 = np.ones([256,1])*constant1[i-1]
-			d2 = np.ones([256,1])*constant2[c-1]
-			d3 = np.ones([256,1])*constant3[n-1]
-			d = np.hstack((d1,d2,d3))
-			for (j,datafile) in enumerate(sampleFiles):
-				ff = np.loadtxt(str(datafile), skiprows=0)
-				d = np.hstack((d,ff))
-	        
-			data = np.vstack((data,d))
+			print "Number of files: " + str(nF);
 			
-			#Write to file
-			if not os.path.exists(newCasePath+'_'+str(sampleTime)+'_results'):
-				os.makedirs(newCasePath+'_'+str(sampleTime)+'_results')
+			if(nF > 1):
+				#Load data
+                                if(ctypes[0] == "num"):
+                                        print "Float constant"
+					d1 = np.ones([256,1])*constant1[i-1]
+                                if(ctypes[0] == "str"):
+                                        print "String constant"
+					d1 = np.empty([256,1], dtype=str)
+                                        for x in range(0, 255):
+                                        	d1[x,0] = constant1[i-1]
+				d2 = np.ones([256,1])*constant2[c-1]
+				d3 = np.ones([256,1])*constant3[n-1]
+				d = np.hstack((d1,d2,d3))
+				for (j,datafile) in enumerate(sampleFiles):
+					ff = np.loadtxt(str(datafile), skiprows=0)
+					d = np.hstack((d,ff))
+				
+				data = np.vstack((data,d))
+				
+				#Write to file
+				if not os.path.exists(newCasePath+'_'+str(sampleTime)+'_results'):
+					os.makedirs(newCasePath+'_'+str(sampleTime)+'_results')
 
-			fp = open(newCasePath +'_'+str(sampleTime)+ '_results/constants' +'_'+str(constant1[i-1])+'_'+str(constant2[c-1])+'_'+str(constant3[n-1]) + '.csv', 'wb')
-			wr = csv.writer(fp)
-			for row in data:
-				wr.writerow(row)
-			fp.close()
+				fp = open(newCasePath +'_'+str(sampleTime)+ '_results/constants' +'_'+str(constant1[i-1])+'_'+str(constant2[c-1])+'_'+str(constant3[n-1]) + '.csv', 'wb')
+				wr = csv.writer(fp)
+				for row in data:
+					wr.writerow(row)
+				fp.close()
+			else:
+				print "File not processed - case might not have run!"
 
-#Copy most recent SampleDict
+#Copy json file
 cpdef = 'cp '+ caseRunnerDir + '/cases/' +jsonFile + ' ' +newCasePath +'_'+str(sampleTime)+'_results/' + jsonFile
 cpresult = call(cpdef,shell=True)
-			
+
+# Copy turbulent potential model files
+cptpC = 'cp /home/nd29a/foam/turbulentPotential/turbulentPotential/turbulentPotential.C ' +newCasePath +'_'+str(sampleTime)+'_results/' + 'turbulentPotential.C'
+cptpCresult = call(cptpC,shell=True)
+cptpH = 'cp /home/nd29a/foam/turbulentPotential/turbulentPotential/turbulentPotential.H ' +newCasePath +'_'+str(sampleTime)+'_results/' + 'turbulentPotential.H'
+cptpHresult = call(cptpH,shell=True)
+	
+# Copy template directory
+cpct = 'cp -a ' + caseTemplatePath + '/. ' +newCasePath +'_'+str(sampleTime)+'_results/' + caseTemplate
+cpctresult = call(cpct,shell=True)
+	
 destDir = '/home/nate/foam/nate-3.2/run/'+newCaseRoot +'_'+str(sampleTime)+'_results'+'_MGHPCC'
 print 'rsync -a -v -e "ssh -c arcfour" '+newCasePath +'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir
 rcall = call('rsync -a -v -e "ssh -c arcfour" '+newCasePath +'_'+str(sampleTime)+'_results/'+' nate@thor.ecs.umass.edu:'+destDir,shell=True)

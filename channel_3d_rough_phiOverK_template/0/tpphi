@@ -21,14 +21,18 @@ boundaryField
     WALL_TOP
     {
         type            tpphiLowReRoughWallTP;
-        ks              <tpphiValueExpression>;
-        value           uniform 0.15;
+        ks              <ksValueExpression>;
+        rType			<rTypeValue>;
+        pkC             <pkCValue>;
+        value           uniform 0.25;
     }
     WALL_BOTTOM
     {
         type            tpphiLowReRoughWallTP;
-        ks              <tpphiValueExpression>;
-        value           uniform 0.15;
+        ks              <ksValueExpression>;
+		rType			<rTypeValue>;
+		pkC             <pkCValue>;
+        value           uniform 0.25;
     }
     SIDE_CYC
     {

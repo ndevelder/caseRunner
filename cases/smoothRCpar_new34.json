@@ -1,0 +1,18 @@
+{ "name": "channel_3d_smooth_rcParNew34",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd"],
+  "dataTypes" : ["str","num","num"],
+  "data": {
+    "constant1" : ["mod", "phi"],
+    "constant2"	: [1.0, 1.15, 1.26],
+    "constant3" : [25, 92, 136]  
+  },
+  "notes" : "Playing with phi equation"
+}
+

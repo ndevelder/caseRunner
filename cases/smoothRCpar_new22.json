@@ -1,0 +1,17 @@
+{ "name": "channel_3d_smooth_rcParNew22",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","tpProd"],
+  "data": {
+    "constant1" : [2.15, 2.2, 2.25],
+    "constant2"	: [18, 20, 22],
+    "constant3" : [1.75, 1.8, 1.85]  
+  },
+  "notes" : "Playing with new Production term and phi epsilon wall condition"
+}
+

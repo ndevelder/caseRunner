@@ -68,14 +68,14 @@ for n in range(1,nCases+1):
 			sampleFiles = glob.glob(sampleDataDir+'/*.xy')
 			nF = len(sampleFiles)
 			
-		
-			# Load data
-			d = np.ones([256,1])*constantC[c-1]
-			for (i,datafile) in enumerate(sampleFiles):
-				# Concatenate vector and scalar files
-				d = np.hstack((d, np.loadtxt(str(datafile), skiprows=0)))
-	        
-			data = np.vstack((data,d))
+			if(nF > 1)
+				# Load data
+				d = np.ones([256,1])*constantC[c-1]
+				for (i,datafile) in enumerate(sampleFiles):
+					# Concatenate vector and scalar files
+					d = np.hstack((d, np.loadtxt(str(datafile), skiprows=0)))
+				
+				data = np.vstack((data,d))
 			
 	# Write to file
 	if not os.path.exists(newCasePath+'_results'):
@@ -86,6 +86,21 @@ for n in range(1,nCases+1):
 	for row in data:
 		wr.writerow(row)
 	fp.close()
+	
+
+#Copy json file
+cpdef = 'cp '+ caseRunnerDir + '/cases/' +jsonFile + ' ' +newCasePath +'_'+str(sampleTime)+'_results/' + jsonFile
+cpresult = call(cpdef,shell=True)
+
+# Copy turbulent potential model files
+cptpC = 'cp /home/nd29a/foam/turbulentPotential/turbulentPotential/turbulentPotential.C ' +newCasePath +'_'+str(sampleTime)+'_results/' + 'turbulentPotential.C'
+cptpCresult = call(cptpC,shell=True)
+cptpH = 'cp /home/nd29a/foam/turbulentPotential/turbulentPotential/turbulentPotential.H ' +newCasePath +'_'+str(sampleTime)+'_results/' + 'turbulentPotential.H'
+cptpHresult = call(cptpH,shell=True)
+	
+# Copy template directory
+cpct = 'cp -a ' + caseTemplatePath + '/. ' +newCasePath +'_'+str(sampleTime)+'_results/' + caseTemplate
+cpctresult = call(cpct,shell=True)
 	
 destDir = '/home/nate/foam/nate-3.2/run/'+newCaseRoot+'_results'+'_MGHPCC'
 print 'rsync -a -v -e "ssh -c arcfour" '+newCasePath+'_results/'+' nate@thor.ecs.umass.edu:'+destDir

@@ -15,30 +15,38 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 dimensions      [0 2 -1 0 0 0 0];
-internalField   uniform 0.002; 
+internalField   uniform 0.05; 
 boundaryField
 {
     WALL_TOP
     {
         type            nutLowReRoughWallTP;
 		Cmu             0.21;
-        value           uniform 0.0005;
+		roughnessHeight 0.0;
+		roughnessConstant 0.0;
+		roughnessFudgeFactor 0.0;
+		nutExp          default;
+        value           uniform 0.005;
     }
     WALL_BOTTOM
     {
         type            nutLowReRoughWallTP;
 		Cmu             0.21;
-		value           uniform 0.0005;
+		roughnessHeight 0.0;
+		roughnessConstant 0.0;
+		roughnessFudgeFactor 0.0;
+		nutExp          default;
+		value           uniform 0.005;
     }
     SIDE_CYC
     {
         type            cyclic;
-        value           uniform 0.02;
+        value           uniform 0.05;
     }
     INOUT_CYC
     {
         type            cyclic;
-        value           uniform 0.02; 
+        value           uniform 0.05; 
     }
 }
 // ************************************************************************* //
