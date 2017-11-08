@@ -1,0 +1,18 @@
+{ "name": "channel_3d_smooth_rcParNew85",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd"],
+  "dataTypes" : ["num","num","num"],
+  "data": {
+    "constant1" : [0.4, 0.6, 0.79],
+    "constant2"	: [0.15, 0.21, 0.33],
+    "constant3" : [0.067, 0.09, 0.12]  
+  },
+  "notes" : "Playing sigma Psi - need more turb visc - sigmaPsi=2.43"
+}
+

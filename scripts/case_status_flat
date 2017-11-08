@@ -2,7 +2,7 @@
 # Find epsilon boundary conditions
 
 from subprocess import call
-import os,sys
+import os,sys,re
 import numpy as np
 import json
 import glob
@@ -62,9 +62,18 @@ for n in range(1,nCases+1):
 	procDir = [os.path.basename(x) for x in glob.glob(newCase+'/processor0/[1-9]*')]
 	procDirS = np.array([float(x) for x in procDir])
 	
+	for f in os.listdir(newCase):
+		if re.match('log', f):
+			foamlog = f
+	
 	print '-------------------------------------'
 	print bcolors.HEADER + newCase + bcolors.ENDC
 	
+	errflag = 0
+	for line in open(str(newCase + "/" + foamlog)):
+		if "Exited" in line:
+			errflag = 1
+			
 	if len(mainDir) > 0:
 		print 'Main case dir: ' + bcolors.HEADER + str(np.max(mainDirS)) + bcolors.ENDC
 	else:
@@ -74,13 +83,15 @@ for n in range(1,nCases+1):
 		print 'Proc1 case dir: ' + bcolors.HEADER + str(np.max(mainDirS)) + bcolors.ENDC
 	else:
 		print 'No timesteps in proc directory'
-	
-	if (len(mainDir) > 0 and len(procDir) < 1):
-		print bcolors.OKGREEN + 'Seems like serial case' + bcolors.ENDC
+		
+	if (len(mainDir) > 0 and len(procDir) < 1 and errflag < 1):
+		print bcolors.OKGREEN + 'Seems like a running serial case' + bcolors.ENDC
 	elif (len(mainDir) > 0 and len(procDir) > 1 and mainDir == procDir):
-		print bcolors.OKGREEN + 'Main directory up to date' + bcolors.ENDC
-	elif (len(mainDir) < 1 and len(procDir) < 1):
-		print bcolors.FAIL + 'Case did not run' + bcolors.ENDC
+		print bcolors.OKGREEN + 'Parallel case - Main directory up to date' + bcolors.ENDC
+	elif (len(mainDir) < 1 and len(procDir) < 1 and errflag < 1):
+		print bcolors.OKGREEN + 'No timesteps recorded - case running' + bcolors.ENDC
+	elif (len(mainDir) > 0 and errflag > 0):
+		print bcolors.FAIL + 'Case exited - check error log and fix/restart' + bcolors.ENDC
 	else:
-		print bcolors.WARNING+ 'Might need reconstruction' + bcolors.ENDC
+		print bcolors.WARNING+ 'Case status undetermined' + bcolors.ENDC
 	#recresult = call('cd '+newCase+' && reconstructPar && cd ..',shell=True)

@@ -28,15 +28,16 @@ turbulentPotentialCoeffs{
    solvePhi            true;
    solveNut            true;
    timeScaleEps        epsilon;
-   prodType            mixed3;
+   prodType            psi;
    pMix  			   0.33;
    eqnSigmaK           false;
    eqnSigmaEps         false;
    eqnSigmaPhi         false;
    eqnSigmaPsi         false;
+   eqncEp1             true;
    eqncEp2             false;
-   eqncMu 	           false;
-   eqnEpsHat           pk;
+   eqncMu 	       false;
+   eqnEpsHat           mod;
    nutType             phi;
    sigmaKInit          1.0; 
    sigmaEpsInit        0.83;
@@ -47,16 +48,16 @@ turbulentPotentialCoeffs{
    phiNuFrac           1.0;
    phiV1               0.0;
    cT                  0.0;
-   cD1                 0.67;
-   cD2                 2.2;
+   cD1                 1.0;
+   cD2                 1.2;
    cD3				   0.15;
-   cD4				   1.35;
-   cPphi               1.7;
-   cP1                 1.83; 
+   cD4				   1.0;
+   cPphi               1.8;
+   cP1                 1.8; 
    cP2                 0.6;
    cP3                 0.12;
    cP4                 0.85714;
-   cEp1                1.45;
+   cEp1                1.44;
    cEp2con			   1.83;
    cMu                 0.21;
    cPr                 1.0;
@@ -65,6 +66,8 @@ turbulentPotentialCoeffs{
    cTv1                0.0;
    debugWrite          false;
    tslimiter           false;
+   lslimiter           false;
+   phiType             none;
    psiProd             psi;
    gT1                 0.0;
    gT2                 0.0;
@@ -73,8 +76,16 @@ turbulentPotentialCoeffs{
    cEhmM			   10.0;
    cEhmPK			   0.09;
    cNF                 0.21;
-   cPw                 25;
+   cPw                 18;
    nutRatMax 		   1e5;
+}
+
+
+boundaryCoeffs{
+   tslimiter    false;
+   nutRatMax     1e5;
+   cMu		0.21;
+   betaK	0.09;
 }
 
 // ************************************************************************* //

@@ -1,0 +1,18 @@
+{ "name": "channel_3d_smooth_rcParElliptic6",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd"],
+  "dataTypes" : ["num","num","num"],
+  "data": {
+    "constant1" : [1.6, 1.7, 1.83],
+    "constant2"	: [0.63, 0.83, 1.0],
+    "constant3" : [0.15, 0.3, 0.42]  
+  },
+  "notes" : "New Elliptic version 2 - testing hanjalic 2 with eqn sigmas"
+}
+

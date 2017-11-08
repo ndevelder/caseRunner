@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 dimensions      [0 2 -1 0 0 0 0];
-internalField   uniform 0.05; 
+internalField   uniform 0.005; 
 boundaryField
 {
     WALL_TOP
@@ -26,7 +26,7 @@ boundaryField
 		roughnessConstant 0.0;
 		roughnessFudgeFactor 0.0;
 		nutExp          default;
-        value           uniform 0.005;
+        value           uniform 0.00001;
     }
     WALL_BOTTOM
     {
@@ -36,17 +36,17 @@ boundaryField
 		roughnessConstant 0.0;
 		roughnessFudgeFactor 0.0;
 		nutExp          default;
-		value           uniform 0.005;
+		value           uniform 0.00001;
     }
     SIDE_CYC
     {
         type            cyclic;
-        value           uniform 0.05;
+        value           uniform 0.005;
     }
     INOUT_CYC
     {
         type            cyclic;
-        value           uniform 0.05; 
+        value           uniform 0.005; 
     }
 }
 // ************************************************************************* //

@@ -19,7 +19,17 @@ def replace_tpphi(case,rp,ks,pk,rt,ph):
 	rtValue = str(rt)
 	phValue = str(ph)
 	
-	if(rtValue == "fixedRatio"):
+	if(rtValue == "fixedratio"):
+		newdata = filedata.replace("<ksValueExpression>",tpphiExpression)
+		newdata = newdata.replace("<pkCValue>",pkValue)
+		newdata = newdata.replace("<rTypeValue>",rtValue)
+
+	if(rtValue == "pow"):
+		newdata = filedata.replace("<ksValueExpression>",tpphiExpression)
+		newdata = newdata.replace("<pkCValue>",pkValue)
+		newdata = newdata.replace("<rTypeValue>",rtValue)
+
+	if(rtValue == "calcratio"):
 		newdata = filedata.replace("<ksValueExpression>",tpphiExpression)
 		newdata = newdata.replace("<pkCValue>",pkValue)
 		newdata = newdata.replace("<rTypeValue>",rtValue)
@@ -48,6 +58,38 @@ def replace_k(case,rp,ks):
         f = open(kFile,'w')
         f.write(newdata)
         f.close()
+		
+# Function to replace k expression
+def replace_psi(case,rp,ks):
+        psiFile = case+'/0/tppsi'
+
+        f = open(psiFile,'r')
+        filedata = f.read()
+        f.close()
+
+	kExpression = str(ks)
+
+        newdata = filedata.replace("<ksValueExpression>",kExpression)
+
+        f = open(psiFile,'w')
+        f.write(newdata)
+        f.close()
+		
+# Function to replace f expression
+def replace_f(case,rp,ks):
+        fFile = case+'/0/f'
+
+        f = open(fFile,'r')
+        filedata = f.read()
+        f.close()
+
+	fExpression = str(ks)
+
+        newdata = filedata.replace("<ksValueExpression>",fExpression)
+
+        f = open(fFile,'w')
+        f.write(newdata)
+        f.close()	
 		
 # Function to replace epsilon expression
 def replace_eps(case,rp,ks):
@@ -93,6 +135,7 @@ epsType = case["epsType"]
 serialRun = case["serialRun"]
 pkratio = case["pkC"]
 rType = case["rType"]
+ellipticCase = case["elliptic"]
 
 constantE   = np.array(case["data"]["constantE"])
 constantL   = np.array(case["data"]["constantL"])
@@ -115,6 +158,9 @@ for n in range(1,nCases+1):
 		replace_eps(newCase,rPlus[n-1],ks[n-1])
 		replace_tpphi(newCase,rPlus[n-1],ks[n-1],pkratio,rType,phiValue[n-1])
 		replace_k(newCase,rPlus[n-1],ks[n-1])
+		replace_psi(newCase,rPlus[n-1],ks[n-1])
+		if ellipticCase == "yes":
+			replace_f(newCase,rPlus[n-1],ks[n-1])
 
 		if decomposeFlag == 'yes':
 			decompresult = call('cd '+newCase+' && decomposePar -force && cd ..',shell=True)
@@ -123,4 +169,4 @@ for n in range(1,nCases+1):
 			if serialRun == "no":
 				bsubresult = call('cd '+newCase+' && bsub < job.mpi && cd ..',shell=True)
 			if serialRun == "yes":
-				bsubresult = call('cd '+newCase+' && bsub < job.serial.mpi && cd ..',shell=True)
+				bsubresult = call('cd '+newCase+' && bsub < job.serial.intel.mpi && cd ..',shell=True)

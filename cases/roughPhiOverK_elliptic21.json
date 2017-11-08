@@ -1,0 +1,24 @@
+{ "name": "channel_3d_rough_phiOverK_elliptic21",
+  "template" : "channel_3d_rough_v2ftp_template",
+  "epsType": "constantOnly",
+  "elliptic" : "yes",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60,
+  "rType" : "pow",
+  "pkC" : 0.135,
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd"],
+  "data": {
+    "rplus" : [5,15,25,35,45,55,65,75,85,95,105,115,125],
+    "phi" : [0.005541798, 0.075180675, 0.134739160, 0.183393867, 0.224617829, 0.260532880, 0.292462137, 0.321280401, 0.347596270, 0.371850916, 0.394374945, 0.415422935, 0.435195391],
+    "constantC" : [0.25700000,0.14000000,0.09500000,0.08330000,0.08250000,0.08250000,0.08250323,0.08249775,0.08249810,0.08250000,0.08249986,0.08249973,0.08249974],
+	"ks" : [0.008515131,0.025545394,0.042575657,0.059605920,0.076636182,0.093666445,0.110696708,0.127726971,0.144757234,0.161787496,0.178817759,0.195848022,0.212878285],
+    "constantE"	: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "constantL"	: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "lengthScale" : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   
+  },
+  "notes" : "Using elliptic equations - using utau3 epsilon and even smaller f bc and pow tpphi"
+}
+

@@ -1,0 +1,18 @@
+{ "name": "channel_3d_smooth_rcParNew74",
+  "template" : "channel_3d_smooth_rcPar2_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60, 
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd"],
+  "dataTypes" : ["num","num","num"],
+  "data": {
+    "constant1" : [0.5, 0.55, 0.6],
+    "constant2"	: [0.53, 0.55, 0.57],
+    "constant3" : [0.14, 0.16, 0.18]  
+  },
+  "notes" : "Playing with new phi and pk epsHat equation with grad terms and prod/k extra pstrain"
+}
+

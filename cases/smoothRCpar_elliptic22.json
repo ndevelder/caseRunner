@@ -1,0 +1,19 @@
+{ "name": "channel_3d_smooth_rcParElliptic22",
+  "template" : "channel_3d_smooth_rcPar2_v2ftp_template",
+  "epsType": "smooth",
+  "submit" : "yes",
+  "decompose" : "no",
+  "serialRun" : "yes",
+  "sampleTime" : 60,
+  "turbulenceModel" : "v2ftp",
+  "vectorSample" : ["y","Ux","Uy","Uz","tppsiX","tppsiY","tppsiZ","vorticityX","vorticityY","vorticityZ"],
+  "scalarSample" : ["y", "p", "k", "epsilon", "tpphi", "nut","epsHat","tpProd","f"],
+  "dataTypes" : ["num","num","num"],
+  "data": {
+    "constant1" : [1.0, 2.0, 3.0],
+    "constant2"	: [0.0, 0.15, 0.3],
+    "constant3" : [1.0, 1.2, 1.4]  
+  },
+  "notes" : "New Elliptic version 2 - testing v2ftp with different cEp1 and more/less psi pstrain"
+}
+

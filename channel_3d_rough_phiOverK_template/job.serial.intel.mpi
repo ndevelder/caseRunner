@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#BSUB -J rgh_590_tp     # Job Name
+#BSUB -n 1                  # 
+#BSUB -R "rusage[mem=2048]"  # ask for 2GB per job slot, or 8GB total
+#BSUB -W 16:00               # How much time does your job need (HH:MM)
+#BSUB -q long                # which queue we want to run in
+#BSUB -R "span[ptile=1]"     # How do we distribute nodes
+#BSUB -oo "log.%J.out"            # Append to output file
+#BSUB -eo "error.%J.err"            # Append to error file
+#BSUB -R "select[model == Intel_EM64T]" # Target only Intel CPUs
+
+export LD_PRELOAD=/home/nd29a/mpi/mvapich2/lib/libmpi.so
+export MV2_IBA_HCA=mlx4_0
+export MV2_VBUF_TOTAL_SIZE=256000
+export MV2_IBA_EAGER_THRESHOLD=255996
+export MV2_CPU_BINDING_POLICY=scatter
+export MV2_SHOW_CPU_BINDING=1
+export MV2_USE_XRC=1
+export MV2_USE_MCAST=1
+
+source $HOME/foam/modules
+source $HOME/foam/foam-extend-3.2/etc/bashrc
+
+pimpleForceFoam
